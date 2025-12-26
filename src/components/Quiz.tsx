@@ -1,79 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-type Question = {
-  sysId: string;
-  questionText: string;
-  questionType: "multiple_choice" | "open_ended";
-  possibleAnswers?: string[];
-  correctAnswer?: string;
-};
-
-type Step = {
-  id: string;
-  stepOrder: number;
-  questions: string[];
-};
-
-type AnswerMap = {
-  [key: string]: string;
-};
-
-type StepProps = {
-  step: Step;
-  questions: Question[];
-  answers: AnswerMap;
-  onAnswerChange: (questionId: string, value: string) => void;
-};
-
-function StepComponent({
-  step,
-  questions,
-  answers,
-  onAnswerChange,
-}: StepProps) {
-  const qid = step.questions[0];
-  const q = questions.find((q) => q.sysId === qid);
-  if (!q) return null;
-
-  return (
-    <div>
-      <p style={{ fontWeight: "bold", marginBottom: "1rem" }}>
-        {q.questionText}
-      </p>
-
-      {q.questionType === "multiple_choice" && q.possibleAnswers && (
-        <div>
-          {q.possibleAnswers.map((opt) => (
-            <label
-              key={opt}
-              style={{ display: "block", marginBottom: "0.5rem" }}
-            >
-              <input
-                type="radio"
-                name={qid}
-                value={opt}
-                checked={answers[qid] === opt}
-                onChange={(e) => onAnswerChange(qid, e.target.value)}
-              />{" "}
-              {opt}
-            </label>
-          ))}
-        </div>
-      )}
-
-      {q.questionType === "open_ended" && (
-        <textarea
-          rows={3}
-          style={{ width: "100%" }}
-          value={answers[qid] || ""}
-          onChange={(e) => onAnswerChange(qid, e.target.value)}
-        />
-      )}
-    </div>
-  );
-}
+import StepComponent from "./StepComponent";
+import type { Question, Step, AnswerMap } from "@/types/Quiz";
+import { fetchData } from "@/lib/fetchData";
 
 export default function Quiz() {
   const [steps, setSteps] = useState<Step[]>([]);
@@ -84,54 +14,7 @@ export default function Quiz() {
   const [error, setError] = useState<string>("");
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const res = await fetch(
-          "https://cdn.contentful.com/spaces/aiytij8vnp0s/environments/master/entries?content_type=step&order=fields.stepOrder",
-          {
-            headers: {
-              Authorization:
-                "Bearer tU-Hi9LxIvOmI76fSyesAnHFn1pf3PKG5PJmvyW3-Ck",
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        const data = await res.json();
-
-        const fetchedQuestions: Question[] =
-          data.includes?.Entry?.map((entry: any) => ({
-            sysId: entry.sys.id,
-            questionText: entry.fields.questionText,
-            questionType: entry.fields.questionType,
-            possibleAnswers: entry.fields.possibleAnswers
-              ? entry.fields.possibleAnswers.content
-                  .map((c: any) => c.content.map((v: any) => v.value))
-                  .flat()
-              : undefined,
-            correctAnswer: entry.fields.correctAnswer,
-          })) || [];
-
-       
-        const fetchedSteps: Step[] = [];
-        data.items.forEach((item: any) => {
-          item.fields.questions.forEach((q: any, index: number) => {
-            fetchedSteps.push({
-              id: `${item.fields.id}-${index}`,
-              stepOrder: item.fields.stepOrder + index * 0.01, 
-              questions: [q.sys.id],
-            });
-          });
-        });
-
-        setQuestions(fetchedQuestions);
-        setSteps(fetchedSteps);
-      } catch (err) {
-        console.error("Error fetching data:", err);
-      }
-    }
-
-    fetchData();
+    fetchData(setQuestions, setSteps);
   }, []);
 
   function handleAnswerChange(questionId: string, value: string) {
