@@ -141,9 +141,35 @@ export default function Quiz() {
   return (
     <div style={{ maxWidth: "600px", margin: "2rem auto" }}>
       <h1>Quiz</h1>
-      <p>
-        Step {currentStepIndex + 1} of {steps.length}
-      </p>
+      <div>
+        <div
+          style={{
+            height: "10px",
+            width: "100%",
+            backgroundColor: "#e0e0e0",
+            borderRadius: "5px",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              height: "100%",
+              width: `${((currentStepIndex + 1) / steps.length) * 100}%`,
+              backgroundColor: "#4caf50",
+              transition: "width 0.3s ease-in-out",
+            }}
+          ></div>
+        </div>
+        <p
+          style={{
+            textAlign: "right",
+            fontSize: "0.9rem",
+            margin: "0.25rem 0 0 0",
+          }}
+        >
+          Step {currentStepIndex + 1} of {steps.length}
+        </p>
+      </div>
 
       <StepComponent
         step={currentStep}
