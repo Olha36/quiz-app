@@ -38,7 +38,7 @@ export default function Quiz() {
   }
 
   function handlePrevious() {
-    setCurrentStepIndex((prev) => Math.max(prev - 1, 0));
+    setCurrentStepIndex((prev) => Math.max(prev - 0, 0));
   }
 
   function handleSubmit() {
@@ -50,33 +50,72 @@ export default function Quiz() {
 
   if (submitted) {
     const totalQuestions = questions.length;
-    const correctCount = questions.filter(
-      (q) => q.correctAnswer && answers[q.sysId] === q.correctAnswer
-    ).length;
+
+    const correctCount = questions.filter((q) => {
+      const userAnswer = answers[q.sysId]?.trim();
+      if (!userAnswer) return false;
+
+      if (q.questionType === "multiple_choice") {
+        const userLetter = userAnswer.trim().charAt(0).toUpperCase();
+        const correctLetter = q.correctAnswer?.trim().charAt(0).toUpperCase();
+        return userLetter === correctLetter;
+      }
+
+      return false;
+    }).length;
+
     const percentage = ((correctCount / totalQuestions) * 100).toFixed(1);
 
     return (
-      <div>
+      <div style={{ maxWidth: "800px", margin: "2rem auto" }}>
         <h1>Quiz Results</h1>
         <p>
           You answered {correctCount} out of {totalQuestions} questions
           correctly ({percentage}%)
         </p>
 
-        <ul>
-          {questions.map((q) => (
-            <li key={q.sysId} style={{ marginBottom: "1rem" }}>
-              <strong>{q.questionText}</strong>
-              <br />
-              Your answer: {answers[q.sysId] || "No answer"}
-              {q.correctAnswer && (
-                <>
-                  <br />
-                  Correct answer: {q.correctAnswer}
-                </>
-              )}
-            </li>
-          ))}
+        <ul style={{ listStyle: "none", padding: 0 }}>
+          {questions.map((q, index) => {
+            const userAnswer = answers[q.sysId] || "No answer";
+            const isCorrect =
+              q.questionType === "multiple_choice"
+                ? userAnswer.trim().charAt(0).toUpperCase() ===
+                  q.correctAnswer?.trim().charAt(0).toUpperCase()
+                : q.correctAnswer
+                    ?.toLowerCase()
+                    .includes(userAnswer.toLowerCase());
+
+            return (
+              <li
+                key={q.sysId}
+                style={{
+                  marginBottom: "1.5rem",
+                  padding: "1rem",
+                  border: "1px solid #ccc",
+                  borderRadius: "8px",
+                  backgroundColor: isCorrect ? "#e6ffed" : "#ffe6e6",
+                }}
+              >
+                <strong>
+                  {index + 1}. {q.questionText}
+                </strong>
+                <br />
+                Your answer: <span>{userAnswer}</span> {isCorrect ? "✅" : "❌"}
+                {q.correctAnswer && (
+                  <>
+                    <br />
+                    Correct answer: <strong>{q.correctAnswer}</strong>
+                  </>
+                )}
+                {q.explanation && (
+                  <>
+                    <br />
+                    Explanation: {q.explanation}
+                  </>
+                )}
+              </li>
+            );
+          })}
         </ul>
       </div>
     );
