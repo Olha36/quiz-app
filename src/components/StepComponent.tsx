@@ -12,17 +12,12 @@ export default function StepComponent({
 
   return (
     <div>
-      <p style={{ fontWeight: "bold", marginBottom: "1rem" }}>
-        {q.questionText}
-      </p>
+      <p className="question-text">{q.questionText}</p>
 
       {q.questionType === "multiple_choice" && q.possibleAnswers && (
         <div>
           {q.possibleAnswers.map((opt) => (
-            <label
-              key={opt}
-              style={{ display: "block", marginBottom: "0.5rem" }}
-            >
+            <label key={opt} className="mc-option">
               <input
                 type="radio"
                 name={stepQuestion}
@@ -39,7 +34,6 @@ export default function StepComponent({
       {q.questionType === "open_ended" && (
         <textarea
           rows={3}
-          style={{ width: "100%" }}
           value={answers[stepQuestion] || ""}
           onChange={(e) => onAnswerChange(stepQuestion, e.target.value)}
         />

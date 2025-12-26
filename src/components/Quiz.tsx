@@ -5,6 +5,7 @@ import StepComponent from "./StepComponent";
 import type { Question, Step, AnswerMap } from "@/types/Quiz";
 import { fetchData } from "@/lib/fetchData";
 import isOpenAnswerCorrect from "@/lib/quizUtils";
+import "../styles/quiz.css";
 
 export default function Quiz() {
   const [steps, setSteps] = useState<Step[]>([]);
@@ -79,14 +80,14 @@ export default function Quiz() {
     const percentage = ((correctCount / totalQuestions) * 100).toFixed(1);
 
     return (
-      <div style={{ maxWidth: "800px", margin: "2rem auto" }}>
+      <div className="results-container">
         <h1>Quiz Results</h1>
-        <p>
+        <p className="summary">
           You answered {correctCount} out of {totalQuestions} questions
           correctly ({percentage}%)
         </p>
 
-        <ul style={{ listStyle: "none", padding: 0 }}>
+        <ul className="results-list">
           {orderedQuestions.map((q, index) => {
             const userAnswer = answers[q.sysId] || "No answer";
 
@@ -101,30 +102,26 @@ export default function Quiz() {
             return (
               <li
                 key={q.sysId}
-                style={{
-                  marginBottom: "1.5rem",
-                  padding: "1rem",
-                  border: "1px solid #ccc",
-                  borderRadius: "8px",
-                  backgroundColor: isCorrect ? "#e6ffed" : "#ffe6e6",
-                }}
+                className={`result-item ${isCorrect ? "correct" : "incorrect"}`}
               >
                 <strong>
                   {index + 1}. {q.questionText}
                 </strong>
-                <br />
-                Your answer: {userAnswer} {isCorrect ? "✅" : "❌"}
+
+                <span className="user-answer">
+                  Your answer: {userAnswer}{" "}
+                  <span className="status">{isCorrect ? "✅" : "❌"}</span>
+                </span>
+
                 {q.correctAnswer && (
-                  <>
-                    <br />
-                    Correct answer: <strong>{q.correctAnswer}</strong>
-                  </>
+                  <span className="correct-answer">
+                    Correct answer: {q.correctAnswer}
+                  </span>
                 )}
                 {q.explanation && (
-                  <>
-                    <br />
+                  <span className="explanation">
                     Explanation: {q.explanation}
-                  </>
+                  </span>
                 )}
               </li>
             );
@@ -139,24 +136,14 @@ export default function Quiz() {
   const allAnswered = answers[qid]?.trim() !== "";
 
   return (
-    <div style={{ maxWidth: "600px", margin: "2rem auto" }}>
+    <div className="quiz-container">
       <h1>Quiz</h1>
-      <div>
-        <div
-          style={{
-            height: "10px",
-            width: "100%",
-            backgroundColor: "#e0e0e0",
-            borderRadius: "5px",
-            overflow: "hidden",
-          }}
-        >
+      <div className="progress-wrapper">
+        <div className="progress-bar">
           <div
+            className="progress-bar-fill"
             style={{
-              height: "100%",
               width: `${((currentStepIndex + 1) / steps.length) * 100}%`,
-              backgroundColor: "#4caf50",
-              transition: "width 0.3s ease-in-out",
             }}
           ></div>
         </div>
@@ -180,7 +167,7 @@ export default function Quiz() {
 
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      <div style={{ marginTop: "1rem" }}>
+      <div style={{ marginTop: "1.5rem" }}>
         {currentStepIndex > 0 && (
           <button onClick={handlePrevious} style={{ marginRight: "0.5rem" }}>
             Previous
