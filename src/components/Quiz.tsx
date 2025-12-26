@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import StepComponent from "./StepComponent";
 import type { Question, Step, AnswerMap } from "@/types/Quiz";
 import { fetchData } from "@/lib/fetchData";
+import isOpenAnswerCorrect from "@/lib/quizUtils";
 
 export default function Quiz() {
   const [steps, setSteps] = useState<Step[]>([]);
@@ -38,7 +39,7 @@ export default function Quiz() {
   }
 
   function handlePrevious() {
-    setCurrentStepIndex((prev) => Math.max(prev - 0, 0));
+    setCurrentStepIndex((prev) => Math.max(prev - 1, 0));
   }
 
   function handleSubmit() {
@@ -49,16 +50,27 @@ export default function Quiz() {
   if (steps.length === 0) return <div>Loading quiz...</div>;
 
   if (submitted) {
-    const totalQuestions = questions.length;
+    const orderedQuestions: Question[] = steps
+      .map((step) => {
+        const qid = step.questions[0];
+        return questions.find((q) => q.sysId === qid);
+      })
+      .filter(Boolean) as Question[];
 
-    const correctCount = questions.filter((q) => {
+    const totalQuestions = orderedQuestions.length;
+
+    const correctCount = orderedQuestions.filter((q) => {
       const userAnswer = answers[q.sysId]?.trim();
       if (!userAnswer) return false;
 
       if (q.questionType === "multiple_choice") {
-        const userLetter = userAnswer.trim().charAt(0).toUpperCase();
-        const correctLetter = q.correctAnswer?.trim().charAt(0).toUpperCase();
-        return userLetter === correctLetter;
+        const u = userAnswer.trim().charAt(0).toUpperCase();
+        const c = q.correctAnswer?.trim().charAt(0).toUpperCase();
+        return u === c;
+      }
+
+      if (q.questionType === "open_ended" && q.correctAnswer) {
+        return isOpenAnswerCorrect(userAnswer, q.correctAnswer);
       }
 
       return false;
@@ -75,15 +87,16 @@ export default function Quiz() {
         </p>
 
         <ul style={{ listStyle: "none", padding: 0 }}>
-          {questions.map((q, index) => {
+          {orderedQuestions.map((q, index) => {
             const userAnswer = answers[q.sysId] || "No answer";
+
             const isCorrect =
               q.questionType === "multiple_choice"
                 ? userAnswer.trim().charAt(0).toUpperCase() ===
                   q.correctAnswer?.trim().charAt(0).toUpperCase()
                 : q.correctAnswer
-                    ?.toLowerCase()
-                    .includes(userAnswer.toLowerCase());
+                ? isOpenAnswerCorrect(userAnswer, q.correctAnswer)
+                : false;
 
             return (
               <li
@@ -100,7 +113,7 @@ export default function Quiz() {
                   {index + 1}. {q.questionText}
                 </strong>
                 <br />
-                Your answer: <span>{userAnswer}</span> {isCorrect ? "✅" : "❌"}
+                Your answer: {userAnswer} {isCorrect ? "✅" : "❌"}
                 {q.correctAnswer && (
                   <>
                     <br />
@@ -147,11 +160,13 @@ export default function Quiz() {
             Previous
           </button>
         )}
+
         {currentStepIndex < steps.length - 1 && (
           <button onClick={handleNext} disabled={!allAnswered}>
             Next
           </button>
         )}
+
         {currentStepIndex === steps.length - 1 && (
           <button onClick={handleSubmit} disabled={!allAnswered}>
             Submit
