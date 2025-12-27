@@ -45,31 +45,6 @@ Check the deployed app here: [https://quiz-app-two-beta-19.vercel.app/](https://
 
 ---
 
-## ⚡ Installation & Setup
-
-1. **Clone the repository:**
-
-```bash
-git clone https://github.com/yourusername/quiz-app.git
-cd quiz-app
-
-2. **Install dependencies:**
-npm install
-# or
-yarn install
-
-
-3. **Create .env.local file in the root folder:**
-NEXT_PUBLIC_ALGOLIA_APP_ID=E7WGVJ548V
-NEXT_PUBLIC_ALGOLIA_SEARCH_KEY=4a0ef72103507017ceeba4e2e1725af4
-ALGOLIA_WRITE_API_KEY=6daadcbac1171cda1ec6381525694849
-ALGOLIA_INDEX_NAME=quiz_results
-
-4. **Run the development server:**
-npm run dev
-# or
-yarn dev
-
 📝 Usage
 
 ## Navigate through the quiz and select answers.
@@ -99,7 +74,32 @@ yarn dev
 
 - Quiz results are saved to Algolia.
 
-⚡ Deployment
 
-The app is deployed to Vercel. Any push to the main branch automatically triggers a deployment.
-Check it live here https://quiz-app-two-beta-19.vercel.app/
+
+
+## ⚡ Installation & Setup
+
+1. **Clone the repository:**
+
+```bash
+git clone https://github.com/yourusername/quiz-app.git
+cd quiz-app
+
+2. **Install dependencies:**
+npm install
+# or
+yarn install
+
+
+3. **Create .env.local file in the root folder:**
+NEXT_PUBLIC_ALGOLIA_APP_ID=E7WGVJ548V
+NEXT_PUBLIC_ALGOLIA_SEARCH_KEY=4a0ef72103507017ceeba4e2e1725af4
+ALGOLIA_WRITE_API_KEY=6daadcbac1171cda1ec6381525694849
+ALGOLIA_INDEX_NAME=quiz_results
+
+4. **Run the development server:**
+npm run dev
+# or
+yarn dev
+
+All rights reverved 2025
