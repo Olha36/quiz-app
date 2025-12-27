@@ -1,6 +1,8 @@
 import type { Question, AnswerMap, Step } from "@/types/Quiz";
 import isOpenAnswerCorrect from "@/lib/quizUtils";
 
+import ResultsChart from "./ResultsChart";
+
 type Props = {
   steps: Step[];
   questions: Question[];
@@ -83,6 +85,11 @@ export default function QuizResults({ steps, questions, answers }: Props) {
           );
         })}
       </ul>
+
+      <ResultsChart
+        correctCount={correctCount}
+        totalQuestions={totalQuestions}
+      />
     </div>
   );
 }
