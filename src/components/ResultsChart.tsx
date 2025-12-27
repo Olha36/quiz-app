@@ -10,13 +10,11 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { ChartProps } from "@/types/Quiz";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-type ChartProps = {
-  correctCount: number;
-  totalQuestions: number;
-};
+
 
 export default function ResultsChart({ correctCount, totalQuestions }: ChartProps) {
   const incorrectCount = totalQuestions - correctCount;

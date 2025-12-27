@@ -23,3 +23,8 @@ export type StepProps = {
   answers: AnswerMap;
   onAnswerChange: (questionId: string, value: string) => void;
 };
+
+export type ChartProps = {
+  correctCount: number;
+  totalQuestions: number;
+};
