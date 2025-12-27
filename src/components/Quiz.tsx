@@ -6,6 +6,7 @@ import type { Question, Step, AnswerMap } from "@/types/Quiz";
 import { fetchData } from "@/lib/fetchData";
 import isOpenAnswerCorrect from "@/lib/quizUtils";
 import "../styles/quiz.css";
+import QuizResults from "./QuizResults";
 
 export default function Quiz() {
   const [steps, setSteps] = useState<Step[]>([]);
@@ -35,7 +36,6 @@ export default function Quiz() {
   }
 
   function handleNext() {
-    if (!validateCurrentStep()) return;
     setCurrentStepIndex((prev) => Math.min(prev + 1, steps.length - 1));
   }
 
@@ -43,9 +43,7 @@ export default function Quiz() {
     setCurrentStepIndex((prev) => Math.max(prev - 1, 0));
   }
 
-  async function handleSubmit() {
-    if (!validateCurrentStep()) return;
-
+  async function handleSubmitQuiz() {
     const orderedQuestions: Question[] = steps
       .map((step) => {
         const qid = step.questions[0];
@@ -77,7 +75,6 @@ export default function Quiz() {
       ((correctCount / totalQuestions) * 100).toFixed(1)
     );
 
-    // ✅ send to Algolia API
     await fetch("/api/quiz-results", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -92,89 +89,25 @@ export default function Quiz() {
     setSubmitted(true);
   }
 
+  async function handleFormSubmit(e: React.FormEvent) {
+    e.preventDefault();
+
+    if (!validateCurrentStep()) return;
+
+    if (currentStepIndex < steps.length - 1) {
+      handleNext();
+    } else {
+      await handleSubmitQuiz();
+    }
+  }
+
   if (steps.length === 0) return <div>Loading quiz...</div>;
 
   if (submitted) {
-    const orderedQuestions: Question[] = steps
-      .map((step) => {
-        const qid = step.questions[0];
-        return questions.find((q) => q.sysId === qid);
-      })
-      .filter(Boolean) as Question[];
-
-    const totalQuestions = orderedQuestions.length;
-
-    const correctCount = orderedQuestions.filter((q) => {
-      const userAnswer = answers[q.sysId]?.trim();
-      if (!userAnswer) return false;
-
-      if (q.questionType === "multiple_choice") {
-        const u = userAnswer.trim().charAt(0).toUpperCase();
-        const c = q.correctAnswer?.trim().charAt(0).toUpperCase();
-        return u === c;
-      }
-
-      if (q.questionType === "open_ended" && q.correctAnswer) {
-        return isOpenAnswerCorrect(userAnswer, q.correctAnswer);
-      }
-
-      return false;
-    }).length;
-
-    const percentage = ((correctCount / totalQuestions) * 100).toFixed(1);
-
     return (
-      <div className="results-container">
-        <h1>Quiz Results</h1>
-        <p className="summary">
-          You answered {correctCount} out of {totalQuestions} questions
-          correctly ({percentage}%)
-        </p>
-
-        <ul className="results-list">
-          {orderedQuestions.map((q, index) => {
-            const userAnswer = answers[q.sysId] || "No answer";
-
-            const isCorrect =
-              q.questionType === "multiple_choice"
-                ? userAnswer.trim().charAt(0).toUpperCase() ===
-                  q.correctAnswer?.trim().charAt(0).toUpperCase()
-                : q.correctAnswer
-                ? isOpenAnswerCorrect(userAnswer, q.correctAnswer)
-                : false;
-
-            return (
-              <li
-                key={q.sysId}
-                className={`result-item ${isCorrect ? "correct" : "incorrect"}`}
-              >
-                <strong>
-                  {index + 1}. {q.questionText}
-                </strong>
-
-                <span className="user-answer">
-                  Your answer: {userAnswer}{" "}
-                  <span className="status">{isCorrect ? "✅" : "❌"}</span>
-                </span>
-
-                {q.correctAnswer && (
-                  <span className="correct-answer">
-                    Correct answer: {q.correctAnswer}
-                  </span>
-                )}
-                {q.explanation && (
-                  <span className="explanation">
-                    Explanation: {q.explanation}
-                  </span>
-                )}
-              </li>
-            );
-          })}
-        </ul>
-      </div>
+      <QuizResults steps={steps} questions={questions} answers={answers} />
     );
   }
-
   const currentStep = steps[currentStepIndex];
   const qid = currentStep.questions[0];
   const allAnswered = answers[qid]?.trim() !== "";
@@ -182,6 +115,7 @@ export default function Quiz() {
   return (
     <div className="quiz-container">
       <h1>Quiz</h1>
+
       <div className="progress-wrapper">
         <div className="progress-bar">
           <div
@@ -207,28 +141,25 @@ export default function Quiz() {
         questions={questions}
         answers={answers}
         onAnswerChange={handleAnswerChange}
+        onSubmit={handleFormSubmit}
       />
 
       {error && <p style={{ color: "red" }}>{error}</p>}
 
       <div style={{ marginTop: "1.5rem" }}>
         {currentStepIndex > 0 && (
-          <button onClick={handlePrevious} style={{ marginRight: "0.5rem" }}>
+          <button
+            type="button"
+            onClick={handlePrevious}
+            style={{ marginRight: "0.5rem" }}
+          >
             Previous
           </button>
         )}
 
-        {currentStepIndex < steps.length - 1 && (
-          <button onClick={handleNext} disabled={!allAnswered}>
-            Next
-          </button>
-        )}
-
-        {currentStepIndex === steps.length - 1 && (
-          <button onClick={handleSubmit} disabled={!allAnswered}>
-            Submit
-          </button>
-        )}
+        <button type="submit" form="quiz-step-form" disabled={!allAnswered}>
+          {currentStepIndex === steps.length - 1 ? "Submit" : "Next"}
+        </button>
       </div>
     </div>
   );

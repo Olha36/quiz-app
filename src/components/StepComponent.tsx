@@ -5,13 +5,14 @@ export default function StepComponent({
   questions,
   answers,
   onAnswerChange,
-}: StepProps) {
+  onSubmit,
+}: StepProps & { onSubmit: (e: React.FormEvent) => void }) {
   const stepQuestion = step.questions[0];
   const q = questions.find((q) => q.sysId === stepQuestion);
   if (!q) return null;
 
   return (
-    <div>
+    <form id="quiz-step-form" onSubmit={onSubmit}>
       <p className="question-text">{q.questionText}</p>
 
       {q.questionType === "multiple_choice" && q.possibleAnswers && (
@@ -24,7 +25,7 @@ export default function StepComponent({
                 value={opt}
                 checked={answers[stepQuestion] === opt}
                 onChange={(e) => onAnswerChange(stepQuestion, e.target.value)}
-              />{" "}
+              />
               {opt}
             </label>
           ))}
@@ -38,6 +39,6 @@ export default function StepComponent({
           onChange={(e) => onAnswerChange(stepQuestion, e.target.value)}
         />
       )}
-    </div>
+    </form>
   );
 }
