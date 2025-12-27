@@ -1,37 +1,105 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🎓 Quiz App
 
-## Getting Started
+[![Vercel](https://img.shields.io/badge/deployed%20on-vercel-black?logo=vercel)](https://quiz-app-two-beta-19.vercel.app/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-000000?logo=next.js&logoColor=white)](https://nextjs.org/)
+[![Contentful](https://img.shields.io/badge/Contentful-000000?logo=contentful&logoColor=white)](https://www.contentful.com/)
+[![Algolia](https://img.shields.io/badge/Algolia-5468FF?logo=algolia&logoColor=white)](https://www.algolia.com/)
 
-First, run the development server:
+A **Next.js quiz application** written in **TypeScript** using **Contentful** as CMS and **Algolia** to save results. The app provides interactive quizzes with:
+
+- **Progress bar** to track user progress.
+- **Results evaluation** with percentage analysis.
+- **Chart visualization** of results.
+- **Deployed on Vercel**: [Live Demo](https://quiz-app-two-beta-19.vercel.app/)
+
+---
+
+## 🛠 Features
+
+- Fetch quiz questions and answer choices dynamically from Contentful.
+- Track user progress through a visual progress bar.
+- Evaluate quiz answers upon completion.
+- Display results as:
+  - Percentage of correct answers.
+  - Detailed chart analysis.
+- Save results to Algolia for analytics or leaderboard.
+- Fully responsive and mobile-friendly.
+
+---
+
+## 🚀 Live Demo
+
+Check the deployed app here: [https://quiz-app-two-beta-19.vercel.app/](https://quiz-app-two-beta-19.vercel.app/)
+
+---
+
+## 💻 Tech Stack
+
+- **Framework:** Next.js
+- **Language:** TypeScript
+- **CMS:** Contentful (Headless CMS)
+- **Database / Search:** Algolia
+- **Charts:** [Chart.js](https://www.chartjs.org/) (for results visualization)
+- **Deployment:** Vercel
+
+---
+
+## ⚡ Installation & Setup
+
+1. **Clone the repository:**
 
 ```bash
+git clone https://github.com/yourusername/quiz-app.git
+cd quiz-app
+
+2. **Install dependencies:**
+npm install
+# or
+yarn install
+
+
+3. **Create .env.local file in the root folder:**
+NEXT_PUBLIC_ALGOLIA_APP_ID=E7WGVJ548V
+NEXT_PUBLIC_ALGOLIA_SEARCH_KEY=4a0ef72103507017ceeba4e2e1725af4
+ALGOLIA_WRITE_API_KEY=6daadcbac1171cda1ec6381525694849
+ALGOLIA_INDEX_NAME=quiz_results
+
+4. **Run the development server:**
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+📝 Usage
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Navigate through the quiz and select answers.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- The progress bar updates as you answer each question.
 
-## Learn More
+- Once finished, your answers are processed:
 
-To learn more about Next.js, take a look at the following resources:
+- A summary of correct/incorrect answers.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- A percentage of correct answers.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- A visual chart showing your performance.
 
-## Deploy on Vercel
+- Results are stored in Algolia, making it easy to track analytics or generate leaderboards.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# quiz-app
+🔗 Contentful Integration
+
+- Quiz questions are fetched from Contentful via their Content Delivery API.
+
+- Questions are dynamically displayed in the quiz.
+
+- Steps are sorted by stepOrder field in Contentful.
+
+📊 Algolia Integration
+
+- Quiz results are saved to Algolia.
+
+⚡ Deployment
+
+The app is deployed to Vercel. Any push to the main branch automatically triggers a deployment.
+Check it live here https://quiz-app-two-beta-19.vercel.app/
