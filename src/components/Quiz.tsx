@@ -43,8 +43,52 @@ export default function Quiz() {
     setCurrentStepIndex((prev) => Math.max(prev - 1, 0));
   }
 
-  function handleSubmit() {
+  async function handleSubmit() {
     if (!validateCurrentStep()) return;
+
+    const orderedQuestions: Question[] = steps
+      .map((step) => {
+        const qid = step.questions[0];
+        return questions.find((q) => q.sysId === qid);
+      })
+      .filter(Boolean) as Question[];
+
+    const totalQuestions = orderedQuestions.length;
+
+    const correctCount = orderedQuestions.filter((q) => {
+      const userAnswer = answers[q.sysId]?.trim();
+      if (!userAnswer) return false;
+
+      if (q.questionType === "multiple_choice") {
+        return (
+          userAnswer.trim().charAt(0).toUpperCase() ===
+          q.correctAnswer?.trim().charAt(0).toUpperCase()
+        );
+      }
+
+      if (q.questionType === "open_ended" && q.correctAnswer) {
+        return isOpenAnswerCorrect(userAnswer, q.correctAnswer);
+      }
+
+      return false;
+    }).length;
+
+    const percentage = Number(
+      ((correctCount / totalQuestions) * 100).toFixed(1)
+    );
+
+    // ✅ send to Algolia API
+    await fetch("/api/quiz-results", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        answers,
+        correctCount,
+        totalQuestions,
+        percentage,
+      }),
+    });
+
     setSubmitted(true);
   }
 
